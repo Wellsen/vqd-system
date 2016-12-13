@@ -10,10 +10,11 @@ DISPLAY = true;
 
 Files = '../database/';
 Name = 'colorcast_red.bmp';
+% Name = 'colorcast_normal.bmp';
 
-Image = imread( [Files, Name] );
+Image = imread( [ Files, Name ] );
 
-[M, N, ~] = size(Image);
+[M, N, ~] = size( Image );
 
 ImageR = Image( :, :, 1 );    [xR, yR] = imhist( ImageR );
 ImageG = Image( :, :, 2 );    [xG, yG] = imhist( ImageG );
@@ -24,17 +25,18 @@ if DISPLAY
     plot( yR, xR, 'r-' );  hold on;
     plot( yG, xG, 'g-' );  hold on;
     plot( yB, xB, 'b-' );  hold off;
-    legend('R-channel', 'G-channel', 'B-channel');
+    legend( 'R-channel', 'G-channel', 'B-channel' );
     grid on;
 end
 
 % Ref[1]. Formula (1) (2)
 Hmin = min( min( ImageR, ImageG ), ImageB );
 Hmax = max( max( ImageR, ImageG ), ImageB );
+
 if DISPLAY
     figure;
-    subplot( 121 );   imshow( Hmin );   title('min');
-    subplot( 122 );   imshow( Hmax );   title('max');
+    subplot( 211 );   imshow( Hmin );   title('Hmin');
+    subplot( 212 );   imshow( Hmax );   title('Hmax');
 end
 
 % Ref[1]. Formula (3)
@@ -53,13 +55,19 @@ Lb = LbR & LbG & LbB;
 Ld = LdR & LdG & LdB;
 
 % Ref[1]. Formula (5)
-LbR(Lb) = ~LbR( Lb );
-LbB(Lb) = ~LbB( Lb );
-LbG(Lb) = ~LbG( Lb );
+LbR( Lb ) = ~LbR( Lb );
+LbB( Lb ) = ~LbB( Lb );
+LbG( Lb ) = ~LbG( Lb );
 
-LdR(Lb) = ~LdR( Ld );
-LdB(Lb) = ~LdB( Ld );
-LdG(Lb) = ~LdG( Ld );
+LdR( Ld ) = ~LdR( Ld );
+LdB( Ld ) = ~LdB( Ld );
+LdG( Ld ) = ~LdG( Ld );
+
+if DISPLAY
+    figure;
+    subplot( 121 ); imshow( Lb );   title( 'Lb' );
+    subplot( 122);  imshow( Ld );   title( 'Ld' );
+end
 
 % Ref[1]. Formula (6)
 length = M * N;
@@ -72,20 +80,21 @@ EIRdR = sum( LdR( : ) ) / length;
 EIRdG = sum( LdG( : ) ) / length;
 EIRdB = sum( LdB( : ) ) / length;
 
-EIRb = [EIRbR, EIRbG, EIRbB];
-EIRd = [EIRbB, EIRdG, EIRdB];
+EIRb = [ EIRbR, EIRbG, EIRbB ];
+EIRd = [ EIRbB, EIRdG, EIRdB ];
 
 if DISPLAY
     figure;
     bar( [ EIRb ; EIRd ] );
 end
 
+% Ref[2]. Formula (5)
 [EIRb, Indexb] = sort( EIRb, 'descend' );
 [EIRd, Indexd] = sort( EIRd, 'descend' );
 
-% Ref[2]. Formula (5)
 T1 = 0.6;   T2 = 0.6;
 CC = zeros( 1, 3 );
+
 if EIRd( 1, 1 ) - EIRd( 1, 2) > T1
     CC( 1, Indexd( end ) ) = 1;
 end
@@ -93,7 +102,6 @@ end
 if EIRb( 1, 1 ) - EIRb( 1, 2) > T2
     CC( 1, Indexb( end ) ) = 1;
 end
+
 % sum(CC)
-Flag = sum(CC) ~= 0
-
-
+Flag = sum( CC ) ~= 0;
