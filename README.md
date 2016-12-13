@@ -1,4 +1,4 @@
-# vqd-system
+# VQD SYSTEM
 This project is about video quality detection.
 
 ### FUNCTION
