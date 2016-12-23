@@ -7,7 +7,7 @@ function Flag = ColorCastDetection( Image )
 
 close all;
 
-DISPLAY = false;
+DISPLAY = true;
 
 [M, N, ~] = size( Image );
 

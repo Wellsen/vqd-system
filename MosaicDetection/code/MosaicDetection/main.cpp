@@ -1,9 +1,12 @@
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+
+#pragma warning(disable:4996)
 
 using namespace std;
 using namespace cv;
@@ -21,6 +24,11 @@ vector<Mat> ImageLayered(const Mat& image) {
         }
     }
 
+    for (int i = 0; i < 256; i++) {
+        char name[20];
+        sprintf(name, "img/layer/%d.bmp", i);
+        imwrite(name, imageLayer[i]);
+    }
     return imageLayer;
 }
 
@@ -29,6 +37,9 @@ void MorphologicaOperation(vector<Mat>& imageLayer) {
     for (int i = 0; i < 256; i++) {
         erode(imageLayer[i], imageLayer[i], kernel);
         dilate(imageLayer[i], imageLayer[i], kernel);
+        char name[30];
+        sprintf(name, "img/morphologica/%d.bmp", i);
+        imwrite(name, imageLayer[i]);
     }
 }
 
@@ -92,6 +103,7 @@ int main() {
     Mat image = imread("../../database/mosaic.bmp");
     Mat imageGray;
     cvtColor(image, imageGray, COLOR_BGR2GRAY);
+    imwrite("gray.jpg", imageGray);
 
     vector<Mat> imageLayer = ImageLayered(imageGray);
     MorphologicaOperation(imageLayer);
